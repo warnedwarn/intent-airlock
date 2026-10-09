@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Intent Airlock</title>
+    <style>
+      :root {
+        --void: #06110f;
+        --panel: #0b1c18;
+        --line: #1e4a3e;
+        --mint: #8cf7c5;
+        --acid: #d9ff67;
+        --amber: #ffb95c;
+        --red: #ff6868;
+        --fog: #b6c9c2;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--void);
+        color: #eaf8f2;
+        font:
+          14px/1.4 ui-monospace,
+          SFMono-Regular,
+          Consolas,
+          monospace;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        padding: 18px 28px;
+        border-bottom: 1px solid var(--line);
+        letter-spacing: 0.12em;
+      }
+      .brand {
+        font-weight: 900;
+        color: var(--mint);
+      }
+      .brand b {
+        color: var(--acid);
+      }
+      .network {
+        font-size: 11px;
+        color: var(--fog);
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      .wallet {
+        justify-self: end;
+        background: transparent;
+        color: var(--mint);
+        border: 1px solid var(--mint);
+        padding: 9px 13px;
+      }
+      .deck {
+        display: grid;
+        grid-template-columns: minmax(420px, 1.15fr) minmax(360px, 0.85fr);
+        min-height: 0;
+      }
+      .radar-bay {
+        position: relative;
+        overflow: hidden;
+        border-right: 1px solid var(--line);
+        background:
+          radial-gradient(circle at 46% 47%, #0e2a22 0 1px, transparent 2px),
+          linear-gradient(135deg, #071411, #06110f);
+      }
+      .radar {
+        position: absolute;
+        width: min(62vw, 720px);
+        aspect-ratio: 1;
+        left: 46%;
+        top: 49%;
+        transform: translate(-50%, -50%);
+        border: 1px solid #2d6556;
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(
+            circle,
+            transparent 0 74px,
+            rgba(140, 247, 197, 0.11) 75px 76px
+          ),
+          conic-gradient(
+            from 12deg,
+            transparent 0 312deg,
+            rgba(140, 247, 197, 0.22) 345deg,
+            transparent 360deg
+          );
+      }
+      .radar:before,
+      .radar:after {
+        content: "";
+        position: absolute;
+        background: #204c40;
+      }
+      .radar:before {
+        width: 1px;
+        height: 100%;
+        left: 50%;
+      }
+      .radar:after {
+        height: 1px;
+        width: 100%;
+        top: 50%;
+      }
+      .sweep {
+        position: absolute;
+        inset: -1px;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0 332deg,
+          rgba(217, 255, 103, 0.55) 356deg,
+          transparent 360deg
+        );
+        animation: scan 6s linear infinite;
+        mix-blend-mode: screen;
+      }
+      @keyframes scan {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .blip {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--acid);
+        box-shadow:
+          0 0 0 8px rgba(217, 255, 103, 0.08),
+          0 0 22px var(--acid);
+      }
+      .blip.one {
+        left: 63%;
+        top: 29%;
+      }
+      .blip.two {
+        left: 34%;
+        top: 64%;
+        background: var(--amber);
+        box-shadow: 0 0 20px var(--amber);
+      }
+      .radar-copy {
+        position: absolute;
+        left: 28px;
+        top: 25px;
+        z-index: 2;
+        max-width: 410px;
+      }
+      .radar-copy small {
+        color: var(--mint);
+        letter-spacing: 0.2em;
+      }
+      .radar-copy h1 {
+        font:
+          800 clamp(46px, 7vw, 104px) / 0.78 Arial Black,
+          Impact,
+          sans-serif;
+        letter-spacing: -0.07em;
+        margin: 20px 0;
+        color: #f2fff8;
+      }
+      .radar-copy p {
+        max-width: 360px;
+        color: var(--fog);
+      }
+      .telemetry {
+        position: absolute;
+        left: 28px;
+        bottom: 24px;
+        right: 28px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--mint);
+        font-size: 10px;
+        letter-spacing: 0.12em;
+      }
+      .strip-board {
+        padding: 25px;
+        background: linear-gradient(180deg, #0b1d19, #071410);
+        overflow: auto;
+      }
+      .strip-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-bottom: 19px;
+      }
+      .strip-head h2 {
+        font:
+          900 25px Arial,
+          sans-serif;
+        margin: 0;
+      }
+      .strip-head span {
+        font-size: 10px;
+        color: var(--fog);
+      }
+      .quota-rings {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .quota-ring {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        border: 7px solid #17372f;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        position: relative;
+        background: radial-gradient(circle, #0b1d19 56%, transparent 57%);
+      }
+      .quota-ring:after {
+        content: "";
+        position: absolute;
+        inset: -7px;
+        border-radius: 50%;
+        border: 7px solid transparent;
+        border-top-color: var(--acid);
+        transform: rotate(35deg);
+      }
+      .quota-ring b {
+        font-size: 22px;
+        color: var(--acid);
+      }
+      .quota-ring small {
+        color: var(--fog);
+      }
+      .flight-strip {
+        display: grid;
+        grid-template-columns: 70px 1fr auto;
+        gap: 14px;
+        align-items: center;
+        border-left: 4px solid var(--mint);
+        background: #102720;
+        padding: 14px;
+        margin: 8px 0;
+      }
+      .flight-strip.amber {
+        border-color: var(--amber);
+      }
+      .flight-strip .code {
+        color: var(--mint);
+        font-weight: 900;
+      }
+      .flight-strip small {
+        display: block;
+        color: var(--fog);
+      }
+      .decision {
+        padding: 5px 8px;
+        border: 1px solid var(--line);
+        font-size: 10px;
+      }
+      .board-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .board-actions button,
+      .drawer button {
+        border: 0;
+        background: var(--acid);
+        color: #07110f;
+        font-weight: 900;
+        padding: 12px;
+      }
+      .board-actions .secondary {
+        background: transparent;
+        color: var(--mint);
+        border: 1px solid var(--line);
+      }
+      .drawer {
+        border-top: 1px solid var(--line);
+        background: #0a1916;
+        padding: 18px 28px;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr auto;
+        gap: 18px;
+        align-items: end;
+      }
+      .drawer section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .field {
+        display: grid;
+        gap: 5px;
+      }
+      .wide {
+        grid-column: 1/-1;
+      }
+      .field label {
+        font-size: 9px;
+        color: var(--mint);
+        letter-spacing: 0.12em;
+      }
+      .field input {
+        width: 100%;
+        border: 1px solid #295547;
+        background: #06110f;
+        color: #eefbf5;
+        padding: 9px;
+      }
+      .drawer-actions {
+        display: grid;
+        gap: 8px;
+      }
+      .status {
+        grid-column: 1/-1;
+        color: var(--amber);
+        font-size: 11px;
+      }
+      .drawer h3 {
+        margin: 0 0 8px;
+        font:
+          800 17px Arial,
+          sans-serif;
+      }
+      .drawer p {
+        margin: 0;
+        color: var(--fog);
+        max-width: 330px;
+      }
+      .result {
+        grid-column: 1/-1;
+        background: #050d0b;
+        border: 1px solid #1f473b;
+        padding: 12px;
+        color: var(--mint);
+        min-height: 42px;
+        white-space: pre-wrap;
+      }
+      .hidden {
+        display: none;
+      }
+      @media (max-width: 900px) {
+        .deck {
+          grid-template-columns: 1fr;
+        }
+        .radar-bay {
+          min-height: 620px;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .radar {
+          width: 680px;
+        }
+        .drawer {
+          grid-template-columns: 1fr;
+        }
+        .quota-rings {
+          max-width: 560px;
+        }
+        .topbar {
+          grid-template-columns: 1fr auto;
+        }
+        .network {
+          display: none;
+        }
+      }
+      @media (max-width: 520px) {
+        .topbar {
+          padding: 14px;
+        }
+        .radar-copy {
+          left: 18px;
+        }
+        .radar-copy h1 {
+          font-size: 58px;
+        }
+        .quota-rings {
+          grid-template-columns: repeat(3, 100px);
+          overflow: auto;
+        }
+        .strip-board {
+          padding: 18px;
+        }
+        .drawer {
+          padding: 18px;
+        }
+        .drawer section {
+          grid-template-columns: 1fr;
+        }
+        .wide {
+          grid-column: auto;
+        }
+        .board-actions {
+          grid-template-columns: 1fr;
+        }
+        .telemetry {
+          left: 18px;
+          right: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">INTENT <b>AIRLOCK</b></div>
+        <div class="network">STUDIONET / SEMANTIC RATE CONTROL</div>
+        <button class="wallet" id="connect">CONNECT OPERATOR</button>
+      </header>
+      <div class="deck">
+        <section class="radar-bay">
+          <div class="radar-copy">
+            <small>AUTONOMOUS ACTION PERIMETER</small>
+            <h1>CONTROL<br />THE RATE.</h1>
+            <p>
+              Validators classify intent. Deterministic quotas decide whether
+              the action crosses. Every clearance leaves a flight strip.
+            </p>
+          </div>
+          <div class="radar">
+            <div class="sweep"></div>
+            <i class="blip one"></i><i class="blip two"></i>
+          </div>
+          <div class="telemetry">
+            <span id="airlockState">AIRLOCK / UNLOADED</span
+            ><span id="policyDigest">POLICY / NO DIGEST</span>
+          </div>
+        </section>
+        <section class="strip-board">
+          <div class="strip-head">
+            <div>
+              <span>LIVE CAPACITY</span>
+              <h2>Quota radar</h2>
+            </div>
+            <span id="epochLabel">NO EPOCH SELECTED</span>
+          </div>
+          <div class="quota-rings">
+            <div class="quota-ring">
+              <b id="readQuota">0/0</b><small>READ</small>
+            </div>
+            <div class="quota-ring">
+              <b id="writeQuota">0/0</b><small>WRITE</small>
+            </div>
+            <div class="quota-ring">
+              <b id="adminQuota">0/0</b><small>ADMIN</small>
+            </div>
+          </div>
+          <div id="strips">
+            <div class="flight-strip">
+              <div class="code">WAIT</div>
+              <div>
+                No clearance record loaded.<small
+                  >Open an airlock or run the live demo.</small
+                >
+              </div>
+              <span class="decision">IDLE</span>
+            </div>
+          </div>
+          <div class="board-actions">
+            <button id="showOpen">OPEN AIRLOCK</button
+            ><button class="secondary" id="showAction">
+              REQUEST CLEARANCE
+            </button>
+          </div>
+        </section>
+      </div>
+      <footer class="drawer">
+        <div>
+          <h3>Mission drawer</h3>
+          <p>
+            Inputs stay below the control surface. The radar shows what the
+            contract actually consumed.
+          </p>
+        </div>
+        <section>
+          <div class="field">
+            <label>AIRLOCK ID</label><input id="aid" value="AIRLOCK-WEB" />
+          </div>
+          <div class="field">
+            <label>ACTION ID</label><input id="xid" value="ACTION-WEB" />
+          </div>
+          <div class="field wide">
+            <label>POLICY URL</label
+            ><input
+              id="policy"
+              value="https://raw.githubusercontent.com/warnedwarn/intent-airlock/main/docs/evidence/flight-policy.md"
+            />
+          </div>
+          <div class="field wide">
+            <label>ACTION INTENT</label
+            ><input
+              id="intent"
+              value="Read the archive index and compare record titles without changing stored data."
+            />
+          </div>
+        </section>
+        <div class="drawer-actions">
+          <button id="open">OPEN AIRLOCK</button
+          ><button id="request">REQUEST CLEARANCE</button
+          ><button id="consume">CONSUME</button
+          ><button id="seal">SEAL EPOCH</button
+          ><button id="demo">RUN LIVE DEMO</button>
+        </div>
+        <div class="status" id="status">STUDIONET / READY</div>
+        <div class="result" id="result">Awaiting an authoritative record.</div>
+      </footer>
+    </main>
+    <script type="module">
+      import {
+        createAccount,
+        createClient,
+      } from "https://esm.sh/genlayer-js@1.1.8";
+      import { studionet } from "https://esm.sh/genlayer-js@1.1.8/chains";
+      const ADDRESS = "__CONTRACT_ADDRESS__",
+        ENDPOINT = "https://studio.genlayer.com/api",
+        $ = (s) => document.querySelector(s);
+      let client;
+      const out = (value) =>
+        ($("#result").textContent =
+          typeof value === "string"
+            ? value
+            : JSON.stringify(
+                value,
+                (_, v) => (typeof v === "bigint" ? v.toString() : v),
+                2,
+              ));
+      const setStatus = (value) => ($("#status").textContent = value);
+      async function connect() {
+        if (!window.ethereum) throw Error("Install MetaMask or Rabby.");
+        const [a] = await ethereum.request({ method: "eth_requestAccounts" });
+        client = createClient({
+          chain: studionet,
+          endpoint: ENDPOINT,
+          account: a,
+          provider: ethereum,
+        });
+        setStatus("OPERATOR CONNECTED");
+        return client;
+      }
+      async function send(c, name, args) {
+        setStatus("SUBMITTED / " + name);
+        const hash = await c.writeContract({
+          address: ADDRESS,
+          functionName: name,
+          args,
+          value: 0n,
+        });
+        setStatus("ACCEPTED / WAITING FOR FINALIZED / " + hash);
+        const receipt = await c.waitForTransactionReceipt({
+          hash,
+          status: "FINALIZED",
+          retries: 180,
+          interval: 5000,
+        });
+        if (
+          String(
+            receipt.result_name ?? receipt.resultName ?? "",
+          ).toUpperCase() !== "MAJORITY_AGREE"
+        )
+          throw Error("FINALIZED WITHOUT AGREEMENT");
+        setStatus("FINALIZED / " + name);
+        return hash;
+      }
+      async function readAirlock(c = client, id = $("#aid").value.trim()) {
+        const reader =
+          c || createClient({ chain: studionet, endpoint: ENDPOINT });
+        const x = await reader.readContract({
+          address: ADDRESS,
+          functionName: "get_airlock",
+          args: [id],
+        });
+        $("#airlockState").textContent = "AIRLOCK / " + x.state;
+        $("#policyDigest").textContent =
+          "POLICY / " + x.policy_digest.slice(0, 10);
+        $("#epochLabel").textContent = x.label.toUpperCase();
+        const q = x.quotas,
+          u = x.used;
+        $("#readQuota").textContent = `${u[0]}/${q[0]}`;
+        $("#writeQuota").textContent = `${u[1]}/${q[1]}`;
+        $("#adminQuota").textContent = `${u[2]}/${q[2]}`;
+        return x;
+      }
+      async function readAction(c = client, id = $("#xid").value.trim()) {
+        const reader =
+          c || createClient({ chain: studionet, endpoint: ENDPOINT });
+        const x = await reader.readContract({
+          address: ADDRESS,
+          functionName: "get_action",
+          args: [id],
+        });
+        $("#strips").innerHTML =
+          `<div class="flight-strip ${x.decision === "AUTHORIZED" ? "" : "amber"}"><div class="code">${x.category}</div><div>${x.description}<small>RISK ${x.risk} / ${x.reason}</small></div><span class="decision">${x.state}</span></div>`;
+        out(x);
+        return x;
+      }
+      $("#connect").onclick = () =>
+        connect().catch((e) => out({ error: e.message }));
+      $("#showOpen").onclick = () => $("#open").focus();
+      $("#showAction").onclick = () => $("#request").focus();
+      $("#open").onclick = async () => {
+        try {
+          const c = client || (await connect());
+          await send(c, "open_airlock", [
+            $("#aid").value,
+            "Archive action perimeter",
+            $("#policy").value,
+            ["READ", "WRITE", "ADMIN"],
+            [3, 2, 1],
+            1,
+          ]);
+          out(await readAirlock(c));
+        } catch (e) {
+          out({ error: e.message });
+        }
+      };
+      $("#request").onclick = async () => {
+        try {
+          const c = client || (await connect());
+          await send(c, "request_clearance", [
+            $("#aid").value,
+            $("#xid").value,
+            $("#intent").value,
+          ]);
+          await readAirlock(c);
+          await readAction(c);
+        } catch (e) {
+          out({ error: e.message });
+        }
+      };
+      $("#consume").onclick = async () => {
+        try {
+          const c = client || (await connect());
+          await send(c, "consume_clearance", [$("#xid").value]);
+          await readAction(c);
+        } catch (e) {
+          out({ error: e.message });
+        }
+      };
+      $("#seal").onclick = async () => {
+        try {
+          const c = client || (await connect());
+          await send(c, "seal_airlock", [$("#aid").value]);
+          out(await readAirlock(c));
+        } catch (e) {
+          out({ error: e.message });
+        }
+      };
+      $("#demo").onclick = async () => {
+        const actor = createAccount(),
+          c = createClient({
+            chain: studionet,
+            endpoint: ENDPOINT,
+            account: actor,
+          }),
+          stamp = Date.now(),
+          aid = "AIRLOCK-" + stamp,
+          xid = "ACTION-" + stamp,
+          tx = {};
+        $("#aid").value = aid;
+        $("#xid").value = xid;
+        try {
+          tx.open = await send(c, "open_airlock", [
+            aid,
+            "Live archive action perimeter",
+            $("#policy").value,
+            ["READ", "WRITE", "ADMIN"],
+            [3, 2, 1],
+            1,
+          ]);
+          tx.request = await send(c, "request_clearance", [
+            aid,
+            xid,
+            $("#intent").value,
+          ]);
+          tx.consume = await send(c, "consume_clearance", [xid]);
+          const a = await readAirlock(c, aid),
+            x = await readAction(c, xid);
+          if (
+            x.state !== "EXECUTED" ||
+            x.decision !== "AUTHORIZED" ||
+            a.used[0] !== 1
+          )
+            throw Error("EXPECTED ONE CONSUMED READ CLEARANCE");
+          out({
+            airlockId: aid,
+            actionId: xid,
+            state: x.state,
+            decision: x.decision,
+            used: a.used,
+            transactions: tx,
+          });
+        } catch (e) {
+          out({ error: e.message, transactions: tx });
+        }
+      };
+    </script>
+  </body>
+</html>

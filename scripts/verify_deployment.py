@@ -1,0 +1,6 @@
+import base64,hashlib,json
+from pathlib import Path
+from genlayer_py import create_client
+from genlayer_py.chains import studionet
+
+ROOT=Path(__file__).parents[1]; deployment=json.loads((ROOT/'deployment.json').read_text()); transaction=create_client(chain=studionet).get_transaction(transaction_hash=deployment['deploymentTransaction']); deployed=base64.b64decode(transaction['data']['contract_code'],validate=True); local=(ROOT/'contracts'/'contract.py').read_bytes(); leaders=transaction.get('consensus_data',{}).get('leader_receipt')or[{}]; leaders=[leaders] if isinstance(leaders,dict) else leaders; changes=transaction.get('consensus_history',{}).get('current_status_changes')or[]; result={'contract':deployment['contractAddress'],'deploymentTransaction':deployment['deploymentTransaction'],'status':changes[-1] if changes else transaction.get('status_name'),'consensus':transaction.get('result_name'),'execution':[row.get('execution_result') for row in leaders],'sourceSha256':hashlib.sha256(deployed).hexdigest(),'sourceMatches':deployed==local}; print(json.dumps(result,indent=2)); assert result['status']=='FINALIZED' and result['consensus']=='MAJORITY_AGREE' and 'SUCCESS' in result['execution'] and result['sourceMatches']; (ROOT/'evidence').mkdir(exist_ok=True); (ROOT/'evidence'/'deployment-verification.json').write_text(json.dumps(result,indent=2)+'\n')
