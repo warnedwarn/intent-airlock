@@ -9,4 +9,4 @@
 | Authorization | Only the submitting wallet can consume one cleared action | PASS source/tests |
 | Deployment/source match | Finalized StudioNet deployment equals repository contract bytes | PASS |
 | Live lifecycle | Open, request, consume, replay rejection, before/after readback | PASS (`AIRLOCK-1791581900`) |
-| Public browser | Canonical Cloudflare build uses deployed address and complete workflow | UNVERIFIED |
+| Public browser | Canonical Cloudflare build uses deployed address and complete workflow | PASS desktop/mobile (`evidence/browser-verification.json`) |

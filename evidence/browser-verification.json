@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-10",
+  "canonicalUrl": "https://intent-airlock.pages.dev/",
+  "title": "Intent Airlock",
+  "deployedContract": "0x11EC92a8092173C2b9311608Aeed539CCDF4d43f",
+  "contractAddressPresent": true,
+  "desktop": {
+    "viewport": "1280x720",
+    "horizontalOverflow": false,
+    "consoleErrorsOrWarnings": [],
+    "workflowControls": [
+      "OPEN AIRLOCK",
+      "REQUEST CLEARANCE",
+      "CONSUME",
+      "SEAL EPOCH",
+      "RUN LIVE DEMO"
+    ]
+  },
+  "mobile": {
+    "viewport": "390x844",
+    "horizontalOverflow": false,
+    "visibleControlCount": 8
+  },
+  "visualIdentity": "Dark autonomous-action control room with radar sweep, quota rings, flight-strip status, and a mission drawer.",
+  "result": "PASS"
+}
