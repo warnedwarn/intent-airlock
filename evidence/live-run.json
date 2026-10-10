@@ -1,0 +1,46 @@
+{
+  "airlockId": "AIRLOCK-1791581900",
+  "actionId": "READ-1791581900",
+  "contract": "0x11EC92a8092173C2b9311608Aeed539CCDF4d43f",
+  "transactions": {
+    "open": "0x87c481e277ff7158bbde4b2aa6af5619bfe33029659da103573c4af4240899bd",
+    "request": "0x5449dacbfc77f81b8a9514a3d493e2435caaef56644b0d09d596762eecf1d720",
+    "consume": "0x9ba62560038a9c8d1466a8ffe77f4e85a67c9c33a20f6afdb8730fa9557eb05e",
+    "replay": "0x1bb5f7129404f20e865a8ae50b0273621629040ffd0f425420f8416f16a6cdd0"
+  },
+  "positive": {
+    "category": "READ",
+    "risk": 0,
+    "decision": "AUTHORIZED",
+    "state": "EXECUTED",
+    "used": [
+      1,
+      0,
+      0
+    ]
+  },
+  "normalizedReplay": {
+    "consensus": "MAJORITY_AGREE",
+    "execution": [
+      "ERROR",
+      "ERROR"
+    ],
+    "usedBefore": [
+      1,
+      0,
+      0
+    ],
+    "usedAfter": [
+      1,
+      0,
+      0
+    ],
+    "actionsBefore": [
+      "READ-1791581900"
+    ],
+    "actionsAfter": [
+      "READ-1791581900"
+    ]
+  },
+  "fixtureDisclosure": "The policy page and wallets are operator-controlled fixtures used to prove cumulative quota and cross-wallet replay behavior."
+}

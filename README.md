@@ -31,3 +31,10 @@ python scripts/verify_deployment.py
 The repository policy and demo wallets are operator-controlled fixtures. They prove policy-digest binding, exact semantic classification, cumulative quota mutation, submitter-only execution, and cross-wallet replay rejection. They are not independent organizations.
 
 Deployment and live transaction evidence are recorded after StudioNet verification in `deployment.json` and `evidence/`.
+
+## Live coordinates
+
+- Control room: https://intent-airlock.pages.dev/
+- StudioNet contract: `0x11EC92a8092173C2b9311608Aeed539CCDF4d43f`
+- Source: https://github.com/warnedwarn/intent-airlock
+- Verified flight: `AIRLOCK-1791581900`, one `READ` clearance consumed, normalized cross-wallet replay rejected without additional quota use

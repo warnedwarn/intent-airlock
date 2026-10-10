@@ -1,0 +1,12 @@
+{
+  "network": "StudioNet",
+  "account": "warnedwarn",
+  "contractAddress": "0x11EC92a8092173C2b9311608Aeed539CCDF4d43f",
+  "deploymentTransaction": "0x6fc37d92f1ffb3ada19470806bbe9acdff73e18b4e2fb5164cc579b2308399ed",
+  "deploymentConsensus": "MAJORITY_AGREE",
+  "deploymentExecution": "SUCCESS",
+  "sourceSha256": "6ef82b0bdb5a72eb73e737204c6f6cd72ee173c76af5d54f964d3eea4e56ecbc",
+  "sourceCommit": "ed68bd8d7ddc3126aff4d69280bc3213965acead",
+  "repository": "https://github.com/warnedwarn/intent-airlock",
+  "publicSite": "https://intent-airlock.pages.dev/"
+}
